@@ -1,0 +1,1 @@
+"""Parking Allotment Backend Application."""

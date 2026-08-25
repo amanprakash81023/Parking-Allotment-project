@@ -1,0 +1,517 @@
+{
+  "info": {
+    "_postman_id": "parking-allotment-api-v1",
+    "name": "Parking Allotment API Acceptance Tests",
+    "description": "Comprehensive Postman collection for the Parking Allotment Backend Challenge (TC01-TC14).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "test_car_plate",
+      "value": "MH12AB1234",
+      "type": "string"
+    },
+    {
+      "key": "test_bike_plate",
+      "value": "MH12BK0001",
+      "type": "string"
+    },
+    {
+      "key": "test_ev_plate",
+      "value": "MH12EV9999",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Slots",
+      "item": [
+        {
+          "name": "TC01 - Create slot A-1 CAR -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slot_number\": \"A-1\",\n  \"slot_type\": \"CAR\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/slots",
+              "host": ["{{base_url}}"],
+              "path": ["slots"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\"slot_number\": \"A-1\", \"slot_type\": \"CAR\"}"},
+                "url": {"raw": "{{base_url}}/slots", "host": ["{{base_url}}"], "path": ["slots"]}
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\"id\": 1, \"slot_number\": \"A-1\", \"slot_type\": \"CAR\", \"status\": \"AVAILABLE\"}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Slot created with status AVAILABLE\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.slot_number).to.eql(\"A-1\");",
+                  "    pm.expect(jsonData.status).to.eql(\"AVAILABLE\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC14 - List slots sorted -> 200",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/slots",
+              "host": ["{{base_url}}"],
+              "path": ["slots"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Slots are returned as list\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(Array.isArray(jsonData)).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Vehicles",
+      "item": [
+        {
+          "name": "TC03 - Register vehicle -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicle_number\": \"{{test_car_plate}}\",\n  \"owner_name\": \"Ravi Kumar\",\n  \"vehicle_type\": \"CAR\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/vehicles",
+              "host": ["{{base_url}}"],
+              "path": ["vehicles"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created Vehicle",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\"vehicle_number\": \"MH12AB1234\", \"owner_name\": \"Ravi Kumar\", \"vehicle_type\": \"CAR\"}"},
+                "url": {"raw": "{{base_url}}/vehicles", "host": ["{{base_url}}"], "path": ["vehicles"]}
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\"id\": 1, \"vehicle_number\": \"MH12AB1234\", \"owner_name\": \"Ravi Kumar\", \"vehicle_type\": \"CAR\"}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Vehicle registered correctly\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.vehicle_number).to.eql(pm.collectionVariables.get(\"test_car_plate\"));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List registered vehicles -> 200",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/vehicles",
+              "host": ["{{base_url}}"],
+              "path": ["vehicles"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Allocation",
+      "item": [
+        {
+          "name": "TC05 - Allocate CAR lowest slot -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicle_number\": \"{{test_car_plate}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/allocate",
+              "host": ["{{base_url}}"],
+              "path": ["allocate"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Allocation Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\"vehicle_number\": \"MH12AB1234\"}"},
+                "url": {"raw": "{{base_url}}/allocate", "host": ["{{base_url}}"], "path": ["allocate"]}
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\"allocation_id\": 1, \"vehicle_number\": \"MH12AB1234\", \"slot_number\": \"A-1\", \"slot_type\": \"CAR\", \"entry_time\": \"2026-07-28T09:15:00Z\", \"status\": \"ACTIVE\"}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Allocation has active status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"ACTIVE\");",
+                  "    pm.expect(jsonData.slot_number).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC08 - Release vehicle -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicle_number\": \"{{test_car_plate}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/release",
+              "host": ["{{base_url}}"],
+              "path": ["release"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Release Vehicle",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\"vehicle_number\": \"MH12AB1234\"}"},
+                "url": {"raw": "{{base_url}}/release", "host": ["{{base_url}}"], "path": ["release"]}
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\"allocation_id\": 1, \"vehicle_number\": \"MH12AB1234\", \"slot_number\": \"A-1\", \"entry_time\": \"2026-07-28T09:15:00Z\", \"exit_time\": \"2026-07-28T11:40:00Z\", \"duration_minutes\": 145, \"status\": \"RELEASED\"}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Allocation released and duration present\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"RELEASED\");",
+                  "    pm.expect(jsonData.duration_minutes).to.be.greaterThan(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC10 - List active allocations -> 200",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/allocations?status=ACTIVE",
+              "host": ["{{base_url}}"],
+              "path": ["allocations"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Error cases",
+      "item": [
+        {
+          "name": "TC02 - Duplicate slot -> 409",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"slot_number\": \"A-1\", \"slot_type\": \"CAR\"}"},
+            "url": {"raw": "{{base_url}}/slots", "host": ["{{base_url}}"], "path": ["slots"]}
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"Error code is SLOT_ALREADY_EXISTS\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.error.code).to.eql(\"SLOT_ALREADY_EXISTS\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC02b - Bad slot format -> 422",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"slot_number\": \"A-01\", \"slot_type\": \"CAR\"}"},
+            "url": {"raw": "{{base_url}}/slots", "host": ["{{base_url}}"], "path": ["slots"]}
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 422\", function () { pm.response.to.have.status(422); });",
+                  "pm.test(\"Error code is VALIDATION_ERROR\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.error.code).to.eql(\"VALIDATION_ERROR\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC04 - Duplicate vehicle lowercase -> 409",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"vehicle_number\": \"mh12ab1234\", \"owner_name\": \"Ravi\", \"vehicle_type\": \"CAR\"}"},
+            "url": {"raw": "{{base_url}}/vehicles", "host": ["{{base_url}}"], "path": ["vehicles"]}
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"Error code is VEHICLE_ALREADY_EXISTS\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.error.code).to.eql(\"VEHICLE_ALREADY_EXISTS\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC06 - Allocate same vehicle twice -> 409",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"vehicle_number\": \"{{test_car_plate}}\"}"},
+            "url": {"raw": "{{base_url}}/allocate", "host": ["{{base_url}}"], "path": ["allocate"]}
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409 or 400\", function () { pm.expect([409, 400]).to.include(pm.response.code); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC09 - Release unregistered plate -> 404",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"vehicle_number\": \"MH99ZZ9999\"}"},
+            "url": {"raw": "{{base_url}}/release", "host": ["{{base_url}}"], "path": ["release"]}
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Error code is VEHICLE_NOT_FOUND\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.error.code).to.eql(\"VEHICLE_NOT_FOUND\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC12 - Vehicle validation error -> 422",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{}"},
+            "url": {"raw": "{{base_url}}/vehicles", "host": ["{{base_url}}"], "path": ["vehicles"]}
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 422\", function () { pm.response.to.have.status(422); });",
+                  "pm.test(\"Error code is VALIDATION_ERROR\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.error.code).to.eql(\"VALIDATION_ERROR\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC13 - Invalid filter parameter -> 422",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/slots?status=BANANA",
+              "host": ["{{base_url}}"],
+              "path": ["slots"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "BANANA"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 422\", function () { pm.response.to.have.status(422); });",
+                  "pm.test(\"Error code is VALIDATION_ERROR\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.error.code).to.eql(\"VALIDATION_ERROR\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
